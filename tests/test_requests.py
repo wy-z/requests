@@ -1539,6 +1539,18 @@ class TestRequests:
         with pytest.raises(InvalidHeader):
             r = requests.get(httpbin('get'), headers=headers_tab)
 
+    def test_cannot_send_dict_objects_in_data(self, httpbin):
+        payload = {"foo_dict": {"foo": 2}}
+
+        # Test without file
+        with pytest.raises(ValueError):
+            r = requests.get(httpbin("post"), data=payload)
+
+        # Test with files
+        with pytest.raises(ValueError):
+            f = io.BytesIO()
+            r = requests.get(httpbin("post"), data=payload, files={"f": f})
+
     @pytest.mark.parametrize('files', ('foo', b'foo', bytearray(b'foo')))
     def test_can_send_objects_with_files(self, httpbin, files):
         data = {'a': 'this is a string'}
